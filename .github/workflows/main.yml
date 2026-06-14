@@ -1,4 +1,4 @@
-name: Build & Release
+name: Build x86-64 24&25
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ jobs:
       matrix:
         sdk:
           - "24.10.6"
-          - "25.12.3"
+          - "25.12.4"
 
     steps:
       - name: Checkout
@@ -32,7 +32,7 @@ jobs:
           if [ "${{ matrix.sdk }}" = "24.10.6" ]; then
             URL="https://archive.openwrt.org/releases/24.10.6/targets/x86/64/openwrt-sdk-24.10.6-x86-64_gcc-13.3.0_musl.Linux-x86_64.tar.zst"
           else
-            URL="https://downloads.openwrt.org/releases/25.12.3/targets/x86/64/openwrt-sdk-25.12.3-x86-64_gcc-14.3.0_musl.Linux-x86_64.tar.zst"
+            URL="https://downloads.openwrt.org/releases/25.12.4/targets/x86/64/openwrt-sdk-25.12.4-x86-64_gcc-14.3.0_musl.Linux-x86_64.tar.zst"
           fi
           echo "Downloading: $URL"
           wget -q "$URL" -O sdk.tar.zst
