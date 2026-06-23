@@ -1,6 +1,7 @@
 name: Build OpenWrt 25.12 Packages
 
 on:
+  push:
   workflow_dispatch:
 
 env:
