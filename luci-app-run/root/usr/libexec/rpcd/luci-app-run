@@ -239,6 +239,10 @@ run_installer() {
     
     case "$name" in
         *.ipk)
+            if ! command -v opkg >/dev/null 2>&1; then
+                json_error "ERR_NO_OPKG"
+                return
+            fi
             (
                 cd "$work" || exit 1
                 printf 'luci-app-run: started %s\n' "$now"
@@ -250,6 +254,10 @@ run_installer() {
             ) > "$log" 2>&1 &
             ;;
         *.apk)
+            if ! command -v apk >/dev/null 2>&1; then
+                json_error "ERR_NO_APK"
+                return
+            fi
             (
                 cd "$work" || exit 1
                 printf 'luci-app-run: started %s\n' "$now"

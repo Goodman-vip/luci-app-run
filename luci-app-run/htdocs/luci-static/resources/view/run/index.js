@@ -3,78 +3,12 @@
 'require rpc';
 'require ui';
 'require poll';
+'require run/i18n';
 
-// ====================== 纯JSON国际化 · 中英双语 ======================
-const RUN_LANG = (function () {
-	try {
-		const m = document.cookie.match(/luci_lang=([a-zA-Z-]+)/);
-		if (m) return m[1].substring(0, 2).toLowerCase();
-
-		if (window.L && L.env && L.env.lang)
-			return L.env.lang.substring(0, 2).toLowerCase();
-
-		return 'zh';
-	} catch (e) {
-		return 'zh';
-	}
-})();
-
-const I18N = {
-	zh: {
-		title: "Run安装器",
-		desc: "在路由器上上传并执行脚本或安装包，注意架构务必匹配。",
-		drop_tip: "拖入文件，或从电脑选择。",
-		choose_file: "选择文件",
-		choose_ipk: "选择 .ipk 包",
-		choose_apk: "选择 .apk 包",
-		execute: "执行",
-		clean_up: "清理",
-		upload_title: "上传文件",
-		log_title: "执行日志",
-		clean_done: "临时文件与日志已清理。",
-		only_supported: "仅支持 .run、.sh、.ipk 和 .apk 文件。",
-		prepare_upload: "准备上传：%s (%s)",
-		upload_failed: "上传失败。",
-		uploading: "正在上传 %s：%d%%",
-		upload_err: "上传请求失败。",
-		upload_invalid: "上传返回格式无效。",
-		upload_done: "上传完成：%s (%s)",
-		starting: "正在启动安装器...",
-		started: "安装器已启动，PID %d。",
-		running: "安装器正在运行。",
-		last_file: "上一次安装包：%s"
-	},
-	en: {
-		title: "Run Installer",
-		desc: "Upload and execute scripts or packages on this router, ensuring architecture compatibility.",
-		drop_tip: "Drop a file here, or choose one from your computer.",
-		choose_file: "Choose file",
-		choose_ipk: "Choose .ipk package",
-		choose_apk: "Choose .apk package",
-		execute: "Execute",
-		clean_up: "Clean up",
-		upload_title: "Upload file",
-		log_title: "Execution log",
-		clean_done: "Temporary files and logs were removed.",
-		only_supported: "Only .run, .sh, .ipk and .apk files are accepted.",
-		prepare_upload: "Preparing upload: %s (%s)",
-		upload_failed: "Upload failed.",
-		uploading: "Uploading %s: %d%%",
-		upload_err: "Upload request failed.",
-		upload_invalid: "Invalid upload response.",
-		upload_done: "Upload complete: %s (%s)",
-		starting: "Starting installer...",
-		started: "Installer started, PID %d.",
-		running: "Installer is running.",
-		last_file: "Last installer: %s"
-	}
-};
-
+var i18n = require('run/i18n');
 function _(key) {
-	const str = I18N[RUN_LANG]?.[key] || I18N.zh[key] || key;
-	return str.format.apply(str, Array.prototype.slice.call(arguments, 1));
+	return i18n._.apply(i18n, arguments);
 }
-// ====================================================================
 
 var uploadStart = rpc.declare({
 	object: 'luci-app-run',
@@ -249,23 +183,19 @@ return view.extend({
 
 		var ipkButton = E('button', {
 			class: 'btn cbi-button cbi-button-add',
-			style: self.capabilities.opkg ? 'margin-left:10px;background-color:#2E7D32;color:white' : 'margin-left:10px;background-color:#ccc;color:#666;border-color:#ccc;cursor:not-allowed;opacity:0.6',
-			disabled: !self.capabilities.opkg,
+			style: 'margin-left:10px;background-color:#2E7D32;color:white',
 			click: function (ev) {
 				ev.preventDefault();
-				if (self.capabilities.opkg)
-					ipkInput.click();
+				ipkInput.click();
 			}
 		}, [_('choose_ipk')]);
 
 		var apkButton = E('button', {
 			class: 'btn cbi-button cbi-button-add',
-			style: self.capabilities.apk ? 'margin-left:10px;background-color:#1565C0;color:white' : 'margin-left:10px;background-color:#ccc;color:#666;border-color:#ccc;cursor:not-allowed;opacity:0.6',
-			disabled: !self.capabilities.apk,
+			style: 'margin-left:10px;background-color:#1565C0;color:white',
 			click: function (ev) {
 				ev.preventDefault();
-				if (self.capabilities.apk)
-					apkInput.click();
+				apkInput.click();
 			}
 		}, [_('choose_apk')]);
 
@@ -442,8 +372,15 @@ return view.extend({
 		state.textContent = _('starting');
 
 		return runInstaller(this.currentUploadId).then(function (res) {
-			if (res && res.error)
-				throw new Error(res.error);
+			if (res && res.error) {
+				var errorMsg = res.error;
+				if (res.error === 'ERR_NO_OPKG') {
+					errorMsg = _('err_no_opkg');
+				} else if (res.error === 'ERR_NO_APK') {
+					errorMsg = _('err_no_apk');
+				}
+				throw new Error(errorMsg);
+			}
 
 			self.logOffset = 0;
 			state.textContent = _('started', res.pid);
