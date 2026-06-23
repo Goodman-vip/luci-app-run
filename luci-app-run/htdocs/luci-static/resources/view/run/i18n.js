@@ -1,5 +1,4 @@
 'use strict';
-'require base';
 
 return {
 	zh: {
