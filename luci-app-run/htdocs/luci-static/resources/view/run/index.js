@@ -3,11 +3,28 @@
 'require rpc';
 'require ui';
 'require poll';
-'require view/run/i18n';
 
-var i18n = require('view/run/i18n');
+var I18N = require('view/run/i18n.json');
+
+function getLang() {
+	try {
+		var m = document.cookie.match(/luci_lang=([a-zA-Z-]+)/);
+		if (m) return m[1].substring(0, 2).toLowerCase();
+
+		if (window.L && L.env && L.env.lang)
+			return L.env.lang.substring(0, 2).toLowerCase();
+
+		return 'zh';
+	} catch (e) {
+		return 'zh';
+	}
+}
+
 function _(key) {
-	return i18n._.apply(i18n, arguments);
+	var lang = getLang();
+	var str = I18N[lang]?.[key] || I18N.zh[key] || key;
+	var args = Array.prototype.slice.call(arguments, 1);
+	return str.format.apply(str, args);
 }
 
 var uploadStart = rpc.declare({
