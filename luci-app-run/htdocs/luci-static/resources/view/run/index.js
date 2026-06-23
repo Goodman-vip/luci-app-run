@@ -254,7 +254,7 @@ return view.extend({
 		var runButton = E('button', {
 			class: 'cbi-button cbi-button-action run-btn',
 			disabled: true,
-			style: 'min-width:140px;margin-left:15px;',
+			style: 'min-width:140px;margin-left:15px;background:#7B1FA2!important;background-color:#7B1FA2!important;background-image:none!important;color:#fff!important;border-color:#7B1FA2!important;box-shadow:none!important;text-shadow:none!important;opacity:1!important',
 			click: function (ev) {
 				ev.preventDefault();
 				self.startRun(runButton, state);
@@ -263,7 +263,7 @@ return view.extend({
 
 		var cleanButton = E('button', {
 			class: 'cbi-button cbi-button-reset run-btn',
-			style: 'margin-left:35px;',
+			style: 'margin-left:35px;background:#C62828!important;background-color:#C62828!important;background-image:none!important;color:#fff!important;border-color:#C62828!important;box-shadow:none!important;text-shadow:none!important;opacity:1!important',
 			click: function (ev) {
 				ev.preventDefault();
 				cleanup().then(function (res) {
